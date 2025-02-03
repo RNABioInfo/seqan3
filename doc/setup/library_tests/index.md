@@ -1,7 +1,7 @@
 # Setting up library tests {#setup_tests}
 
-<!-- SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-     SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+<!-- SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+     SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
      SPDX-License-Identifier: CC-BY-4.0
 -->
 
@@ -19,7 +19,7 @@ Before submitting a pull request to our repository, make sure that the unit test
 
 ## Setting up unit tests
 
-Assume that you have cloned SeqAn including submodules into `/home/me/devel/seqan3` and performed some local changes.
+Assume that you have cloned SeqAn into `/home/me/devel/seqan3` and performed some local changes.
 
 Create an out-of-source build directory and change to it:
 

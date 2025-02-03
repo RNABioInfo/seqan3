@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 # This file adds version support for `find_package(SEQAN3 3.1)`.
@@ -10,7 +10,7 @@
 
 # Note that seqan3-config.cmake can be standalone and thus SEQAN3_CLONE_DIR might be empty.
 find_path (SEQAN3_CLONE_DIR
-           NAMES build_system/seqan3-config.cmake
+           NAMES cmake/seqan3-config.cmake
            HINTS "${CMAKE_CURRENT_LIST_DIR}/..")
 find_path (SEQAN3_INCLUDE_DIR
            NAMES seqan3/version.hpp

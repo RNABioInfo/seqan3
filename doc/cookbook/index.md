@@ -1,7 +1,7 @@
 # The SeqAn Cookbook {#cookbook}
 
-<!-- SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-     SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+<!-- SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+     SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
      SPDX-License-Identifier: CC-BY-4.0
 -->
 
@@ -410,7 +410,6 @@ Search for keywords with `Strg + F`.
 \include test/snippet/core/debug_stream_set_underlying_stream.cpp
 \include test/snippet/core/debug_stream_set_underlying_stream2.cpp
 \include test/snippet/core/debug_stream_usage.cpp
-\include test/snippet/core/detail/copyable_wrapper.cpp
 \include test/snippet/core/detail/customisation_point.cpp
 \include test/snippet/core/detail/deferred_crtp_base.cpp
 \include test/snippet/core/detail/is_class_template_declarable_with.cpp
@@ -439,7 +438,6 @@ Search for keywords with `Strg + F`.
 \include test/snippet/io/sam_file/sam_file_input_front.cpp
 \include test/snippet/io/sam_file/sam_file_input_get_header.cpp
 \include test/snippet/io/sam_file/sam_file_input_my_traits.cpp
-\include test/snippet/io/sam_file/sam_file_input_options.cpp
 \include test/snippet/io/sam_file/sam_file_input_reading_custom_fields.cpp
 \include test/snippet/io/sam_file/sam_file_input_reading_filter.cpp
 \include test/snippet/io/sam_file/sam_file_input_reading_move_record.cpp

@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -34,6 +34,7 @@ struct sam_file_program_info_t
     std::string previous;          //!< The id of the previous program if program calls were chained.
     std::string description;       //!< A description of the program and/or program call.
     std::string version;           //!< The program/tool version.
+    std::string user_tags;         //!< Additional user-defined tags.
 };
 
 /*!\brief Stores the header information of SAM/BAM files.
@@ -48,24 +49,17 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    sam_file_header() = default;                                   //!< Defaulted.
-    sam_file_header(sam_file_header const &) = delete;             //!< Deleted. Holds a unique_ptr.
-    sam_file_header & operator=(sam_file_header const &) = delete; //!< Deleted. Holds a unique_ptr.
-    sam_file_header(sam_file_header &&) = default;                 //!< Defaulted.
-    sam_file_header & operator=(sam_file_header &&) = default;     //!< Defaulted.
-    ~sam_file_header() = default;                                  //!< Defaulted.
+    sam_file_header() = default;                                    //!< Defaulted.
+    sam_file_header(sam_file_header const &) = default;             //!< Defaulted.
+    sam_file_header & operator=(sam_file_header const &) = default; //!< Defaulted.
+    sam_file_header(sam_file_header &&) = default;                  //!< Defaulted.
+    sam_file_header & operator=(sam_file_header &&) = default;      //!< Defaulted.
+    ~sam_file_header() = default;                                   //!< Defaulted.
 
-    /*!\brief Construct from a range of reference ids which redirects the `ref_ids_ptr` member (non-owning).
-     * \param[in] ref_ids The range over reference ids to redirect the pointer at.
+    /*!\brief Construct from a range of reference ids.
+     * \param[in] ref_ids The range over reference ids.
      */
-    sam_file_header(ref_ids_type & ref_ids) : ref_ids_ptr{&ref_ids, ref_ids_deleter_noop}
-    {}
-
-    /*!\brief Construct from a rvalue range of reference ids which is moved into the `ref_ids_ptr` (owning).
-     * \param[in] ref_ids The range over reference ids to own.
-     */
-    sam_file_header(ref_ids_type && ref_ids) :
-        ref_ids_ptr{new ref_ids_type{std::move(ref_ids)}, ref_ids_deleter_default}
+    sam_file_header(ref_ids_type ref_ids) : reference_ids{std::move(ref_ids)}
     {}
     //!\}
 
@@ -82,22 +76,12 @@ public:
     std::vector<std::string> comments; //!< The list of comments.
 
 private:
-    //!\brief The type of the internal ref_ids pointer. Allows dynamically setting ownership management.
-    using ref_ids_ptr_t = std::unique_ptr<ref_ids_type, std::function<void(ref_ids_type *)>>;
-    //!\brief Stream deleter that does nothing (no ownership assumed).
-    static void ref_ids_deleter_noop(ref_ids_type *)
-    {}
-    //!\brief Stream deleter with default behaviour (ownership assumed).
-    static void ref_ids_deleter_default(ref_ids_type * ptr)
-    {
-        delete ptr;
-    }
     //!\brief The key's type of ref_dict.
     using key_type = std::conditional_t<std::ranges::contiguous_range<std::ranges::range_reference_t<ref_ids_type>>,
                                         std::span<range_innermost_value_t<ref_ids_type> const>,
                                         type_reduce_t<std::ranges::range_reference_t<ref_ids_type>>>;
-    //!\brief The pointer to reference ids information (non-owning if reference information is given).
-    ref_ids_ptr_t ref_ids_ptr{new ref_ids_type{}, ref_ids_deleter_default};
+    //!\brief The reference ids.
+    ref_ids_type reference_ids{};
 
     //!\brief Custom hash function since std::hash is not defined for all range types (e.g. std::span<char>).
     struct key_hasher
@@ -139,7 +123,7 @@ public:
      */
     ref_ids_type & ref_ids()
     {
-        return *ref_ids_ptr;
+        return reference_ids;
     }
 
     /*!\brief The reference information. (used by the SAM/BAM format)
@@ -213,6 +197,8 @@ public:
      * * **SM:** Sample. Use pool name where a pool is being sequenced.
      */
     std::vector<std::pair<std::string, std::string>> read_groups;
+
+    std::string user_tags; //!< Additional user-defined tags.
 };
 
 } // namespace seqan3

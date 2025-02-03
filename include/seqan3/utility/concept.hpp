@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -134,7 +134,7 @@ concept trivially_copyable = std::copyable<t> && std::is_trivially_copyable_v<t>
  */
 //!\cond
 template <typename t>
-concept trivial = trivially_copyable<t> && trivially_destructible<t> && std::is_trivial_v<t>;
+concept trivial = trivially_copyable<t> && trivially_destructible<t> && std::is_trivially_default_constructible_v<t>;
 //!\endcond
 
 /*!\interface seqan3::standard_layout

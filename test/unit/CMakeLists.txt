@@ -1,12 +1,14 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.10...3.22)
+cmake_minimum_required (VERSION 3.20...3.31)
 project (seqan3_test_unit CXX)
 
 include (../seqan3-test.cmake)
 include (GoogleTest OPTIONAL)
+
+CPMGetPackage (googletest)
 
 include (diagnostics/list_missing_unit_tests)
 include (diagnostics/list_unused_unit_tests)
@@ -42,9 +44,6 @@ macro (seqan3_test unit_test_cpp)
     unset (target)
     unset (test_name)
 endmacro ()
-
-seqan3_require_ccache ()
-seqan3_require_test ()
 
 add_subdirectories ()
 

@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -25,7 +25,9 @@ TYPED_TEST_SUITE(debug_stream_test, container_of_container_types, );
 
 TYPED_TEST(debug_stream_test, container_of_container)
 {
+    SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_START(-Warray-bounds, -Wstringop-overflow)
     TypeParam t1{"ACGT"_dna4, "ACGT"_dna4, "GAGGA"_dna4};
+    SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_STOP
 
     std::ostringstream o;
     seqan3::debug_stream_type my_stream{o};

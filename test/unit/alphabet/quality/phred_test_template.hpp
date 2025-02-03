@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -14,7 +14,7 @@ TYPED_TEST_SUITE_P(phred);
 // test provision of data type `phred_type` and phred converter.
 TYPED_TEST_P(phred, concept_check)
 {
-    EXPECT_TRUE(std::is_trivial_v<TypeParam>);
+    EXPECT_TRUE(seqan3::trivial<TypeParam>);
 
     EXPECT_TRUE(seqan3::quality_alphabet<TypeParam>);
     EXPECT_TRUE(seqan3::quality_alphabet<TypeParam &>);

@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -35,6 +35,22 @@ TEST(pretty_printing, char)
 {
     EXPECT_EQ(gtest_str('a'), "'a' (97, 0x61)"s);
     EXPECT_EQ(debug_str('a'), "a"s);
+}
+
+TEST(pretty_printing, charX_t)
+{
+    EXPECT_EQ(gtest_str(char8_t{5}), "U+0005"s);
+    EXPECT_EQ(gtest_str(char16_t{5}), "U+0005"s);
+    EXPECT_EQ(gtest_str(char32_t{5}), "U+0005"s);
+    // EXPECT_EQ(debug_str(char8_t{5}), "U+0005"s);
+    // EXPECT_EQ(debug_str(char16_t{5}), "U+0005"s);
+    // EXPECT_EQ(debug_str(char32_t{5}), "U+0005"s);
+}
+
+TEST(pretty_printing, cstring)
+{
+    EXPECT_EQ(gtest_str("test"), "\"test\""s);
+    EXPECT_EQ(debug_str("test"), "test"s);
 }
 
 TEST(pretty_printing, tuple)

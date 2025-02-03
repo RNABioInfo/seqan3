@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -99,7 +99,7 @@ inline void test_search_hamming(auto index,
         while (std::adjacent_find(error_positions.begin(), error_positions.end()) != error_positions.end());
 
         // Construct query sequence with chosen error positions.
-        for (uint8_t error = 0; error < error_positions.size(); ++error)
+        for (size_t error = 0; error < error_positions.size(); ++error)
         {
             uint64_t const pos = error_positions[error] + current_blocks_length;
             // Decrease alphabet size by one because we don't want to replace query[pos], with the same character.
@@ -206,7 +206,7 @@ test_search_scheme_hamming(search_scheme_t const & search_scheme, size_t const s
 
     // Calculate all error distributions and sort each of them (from left to right).
     uint8_t max_error = 0;
-    for (uint8_t search_id = 0; search_id < search_scheme.size(); ++search_id)
+    for (size_t search_id = 0; search_id < search_scheme.size(); ++search_id)
     {
         ordered_search_scheme[search_id] = search_scheme[search_id];
         seqan3::search_error_distribution(error_distributions[search_id], search_scheme[search_id]);
@@ -228,7 +228,7 @@ test_search_scheme_hamming(search_scheme_t const & search_scheme, size_t const s
             for (uint64_t query_length = query_length_min; query_length < query_length_max; ++query_length)
             {
                 auto const block_info = search_scheme_block_info(search_scheme, query_length);
-                for (uint8_t search_id = 0; search_id < search_scheme.size(); ++search_id)
+                for (size_t search_id = 0; search_id < search_scheme.size(); ++search_id)
                 {
                     auto const & [blocks_length, start_pos] = block_info[search_id];
 

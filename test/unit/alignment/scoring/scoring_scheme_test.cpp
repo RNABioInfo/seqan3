@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -59,7 +59,7 @@ TEST(nucleotide_scoring_scheme, template_argument_deduction)
     }
 
     {
-        std::array<std::array<int16_t, 15>, 15> m;
+        std::array<std::array<int16_t, 15>, 15> m{};
         seqan3::nucleotide_scoring_scheme scheme{m};
         EXPECT_TRUE((std::is_same_v<decltype(scheme), seqan3::nucleotide_scoring_scheme<int16_t>>));
     }
@@ -83,7 +83,7 @@ TEST(aminoacid_scoring_scheme, template_argument_deduction)
     }
 
     {
-        std::array<std::array<int16_t, 27>, 27> m;
+        std::array<std::array<int16_t, 27>, 27> m{};
         seqan3::aminoacid_scoring_scheme scheme{m};
         EXPECT_TRUE((std::is_same_v<decltype(scheme), seqan3::aminoacid_scoring_scheme<int16_t>>));
     }

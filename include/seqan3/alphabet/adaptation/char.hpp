@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -31,8 +31,9 @@ namespace seqan3::detail
 //!\ingroup alphabet_adaptation
 //!\hideinitializer
 template <typename type>
-constexpr bool is_char_adaptation_v = std::same_as<type, char> || std::same_as<type, char16_t>
-                                   || std::same_as<type, char32_t> || std::same_as<type, wchar_t>;
+constexpr bool is_char_adaptation_v =
+    std::same_as<type, char> || std::same_as<type, char8_t> || std::same_as<type, char16_t>
+    || std::same_as<type, char32_t> || std::same_as<type, wchar_t>;
 } // namespace seqan3::detail
 
 namespace seqan3::custom

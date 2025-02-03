@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
 name: Coverage
@@ -42,20 +42,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: true
           fetch-depth: 0
-
-      - name: Checkout SeqAn2
-        uses: actions/checkout@v4
-        with:
-          repository: seqan/seqan
-          path: submodules/seqan
 
       - name: Load ccache
         uses: actions/cache@v4
         with:
           path: /home/runner/.ccache
-          save-always: true
           key: ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.run_id }}
           restore-keys: |
             ccache-${{ runner.os }}-${{ github.workflow }}-${{ matrix.compiler }}-${{ github.ref }}
@@ -68,7 +60,7 @@ jobs:
         run: |
           mkdir build && cd build
           cmake ../test/coverage -DCMAKE_BUILD_TYPE=Coverage
-          make gtest_build
+          make gtest_main
 
       - name: Build tests
         working-directory: build
@@ -79,7 +71,7 @@ jobs:
 
       - name: Run tests
         working-directory: build
-        run: ctest . -j --output-on-failure
+        run: ctest . -j --output-on-failure --no-tests=error
 
       - name: Generate coverage report
         run: |

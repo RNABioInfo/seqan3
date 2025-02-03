@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
@@ -19,7 +19,7 @@
 //!\brief The patch version as MACRO.
 #define SEQAN3_VERSION_PATCH 0
 //!\brief The release candidate number. 0 means stable release, >= 1 means release candidate.
-#define SEQAN3_RELEASE_CANDIDATE 1
+#define SEQAN3_RELEASE_CANDIDATE 4
 
 //!\brief The full version as MACRO (number).
 #define SEQAN3_VERSION (SEQAN3_VERSION_MAJOR * 10000 + SEQAN3_VERSION_MINOR * 100 + SEQAN3_VERSION_PATCH)

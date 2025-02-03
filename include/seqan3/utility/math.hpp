@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -123,9 +123,25 @@ base_t pow(base_t base, exp_t exp)
     if (base == 0)
         return 0;
 
+    auto check = [base](base_t result)
+    {
+        if (base > 0)
+        {
+            return result > std::numeric_limits<base_t>::max() / base;
+        }
+        else if (result < 0) // and base < 0
+        {
+            return result < std::numeric_limits<base_t>::max() / base;
+        }
+        else // base < 0 and result > 0
+        {
+            return base < std::numeric_limits<base_t>::min() / result;
+        }
+    };
+
     for (exp_t i = 0; i < exp; ++i)
     {
-        if ((base < 0 ? std::numeric_limits<base_t>::min() : std::numeric_limits<base_t>::max()) / base < result)
+        if (check(result))
         {
             std::string error_message{"Calculating " + std::to_string(base) + '^' + std::to_string(exp)
                                       + " will result in an "

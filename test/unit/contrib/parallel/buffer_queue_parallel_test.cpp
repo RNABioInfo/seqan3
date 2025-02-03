@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -15,11 +15,8 @@
 template <typename sequential_push_t, typename sequential_pop_t>
 void test_buffer_queue_wait_status()
 {
-    size_t thread_count = std::thread::hardware_concurrency();
-
-    // limit thread count as virtualbox (used by Travis) seems to have problems with thread congestion
-    if (thread_count > 4)
-        thread_count = 4;
+    // At least two threads (one producer and one consumer), at most 4 threads (avoid congestion).
+    size_t thread_count = std::clamp<size_t>(std::thread::hardware_concurrency(), 2u, 4u);
 
     size_t writer_count = thread_count / 2;
     if constexpr (sequential_push_t::value)
@@ -129,11 +126,9 @@ void test_buffer_queue_wait_throw(size_t initialCapacity)
     }
 
     volatile std::atomic<size_t> chk_sum2 = 0;
-    size_t thread_count = std::thread::hardware_concurrency();
 
-    // limit thread count as virtualbox (used by Travis) seems to have problems with thread congestion
-    if (thread_count > 4)
-        thread_count = 4;
+    // At least two threads (one producer and one consumer), at most 4 threads (avoid congestion).
+    size_t thread_count = std::clamp<size_t>(std::thread::hardware_concurrency(), 2u, 4u);
 
     size_t writer_count = thread_count / 2;
     if constexpr (sequential_push_t::value)
@@ -142,8 +137,8 @@ void test_buffer_queue_wait_throw(size_t initialCapacity)
     if constexpr (sequential_pop_t::value)
         thread_count = writer_count + 1;
 
-    // std::cout << "threads: " << thread_count << ‘\n‘;
-    // std::cout << "writers: " << writer_count << ‘\n‘;
+    // std::cout << "threads: " << thread_count << '\n';
+    // std::cout << "writers: " << writer_count << '\n';
 
     ASSERT_GE(thread_count, 2u);
 
@@ -152,8 +147,8 @@ void test_buffer_queue_wait_throw(size_t initialCapacity)
     std::vector<std::thread> workers;
     std::atomic<size_t> registered_writer = 0;
     std::atomic<size_t> registered_reader = 0;
-    seqan3::contrib::queue_op_status push_status = seqan3::contrib::queue_op_status::success;
-    seqan3::contrib::queue_op_status pop_status = seqan3::contrib::queue_op_status::success;
+    std::atomic<seqan3::contrib::queue_op_status> push_status = seqan3::contrib::queue_op_status::success;
+    std::atomic<seqan3::contrib::queue_op_status> pop_status = seqan3::contrib::queue_op_status::success;
     for (size_t tid = 0; tid < thread_count; ++tid)
     {
         workers.push_back(std::thread(

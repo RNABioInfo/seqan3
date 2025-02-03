@@ -1,13 +1,6 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
-
-cmake_minimum_required (VERSION 3.14)
-
-# https://cmake.org/cmake/help/latest/policy/CMP0135.html
-if (POLICY CMP0135)
-    cmake_policy (SET CMP0135 NEW)
-endif ()
 
 # We can only set one CMAKE_SYSTEM_PREFIX_PATH, i.e. it cannot be a list.
 # Hence we need to reuse the SEQAN3_SYSTEM_PREFIX.

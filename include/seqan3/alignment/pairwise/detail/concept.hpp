@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -121,7 +121,7 @@ concept align_pairwise_single_input =
  * a) An lvalue range, whose reference type is a tuple like lvalue reference,
  * b) A range, whose reference type is a tuple over viewable ranges.
  * This covers also transforming and non-transforming views (e.g. views::zip, or views::take).
- * Only a temporary non-view range piped with seqan3::detail::all can't be handled securely.
+ * Only a temporary non-view range piped with std::views::all can't be handled securely.
  */
 //!\cond
 template <typename t>

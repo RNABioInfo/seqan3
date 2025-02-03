@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -1065,8 +1065,7 @@ concept writable_alphabet = alphabet<t> && writable_semialphabet<t> && requires 
  *
  * \{
  */
-/*!
- * \brief Save an alphabet letter to stream.
+/*!\brief Save an alphabet letter to stream.
  * \tparam archive_t Must satisfy seqan3::cereal_output_archive.
  * \tparam alphabet_t Type of l; must satisfy seqan3::semialphabet.
  * \param l The alphabet letter.

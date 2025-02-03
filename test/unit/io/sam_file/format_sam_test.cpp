@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -24,7 +24,8 @@ struct sam_file_read<seqan3::format_sam> : public sam_file_data
     // However, encountering such a tag should not break the parsing.
     std::string unknown_tag_header{
         R"(@HD	VN:1.6	pb:5.0.0	otter
-@SQ	SN:ref	LN:34
+@SQ	SN:ref	LN:34	pb:5.0.0	otter
+@RG	ID:R1	pb:5.0.0	otter
 @PG	ID:novoalign	pb:5.0.0	otter
 )"};
 
@@ -87,10 +88,10 @@ read3	43	ref	3	63	1S1M1P1M1I1M1I1D1M1S	ref	10	300	GGAGTATA	!!*+,-./
     // -----------------------------------------------------------------------------------------------------------------
 
     std::string verbose_output{
-        R"(@HD	VN:1.6	SO:unknown	GO:none
-@SQ	SN:ref	LN:34	AN:other_name
-@RG	ID:group1	DS:more info
-@PG	ID:prog1	PN:cool_program	CL:./prog1	PP:a	DS:b	VN:c
+        R"(@HD	VN:1.6	SO:unknown	GO:none	pb:5.0.0	otter
+@SQ	SN:ref	LN:34	AN:other_name	pb:5.0.0	otter
+@RG	ID:group1	DS:more info	pb:5.0.0	otter
+@PG	ID:prog1	PN:cool_program	CL:./prog1	PP:a	DS:b	VN:c	pb:5.0.0	otter
 @CO	This is a comment.
 read1	41	ref	1	61	1S1M1D1M1I	ref	10	300	ACGT	!##$	AS:i:2	CC:i:300	NM:i:-7	aa:A:c	cc:i:-300	ff:f:3.1	zz:Z:str
 read2	42	ref	2	62	1H7M1D1M1S2H	ref	10	300	AGGCTGNAG	!##$&'()*	bC:B:C,3,200	bI:B:I,294967296	bS:B:S,300,40,500	bc:B:c,-3	bf:B:f,3.5,0.1,43.8	bi:B:i,-3,200,-66000	bs:B:s,-3,200,-300
@@ -106,6 +107,20 @@ read1	41	*	1	61	1S1M1D1M1I	*	0	0	ACGT	!##$
     std::string wrong_hexadecimal_tag{
         R"(@SQ	SN:ref	LN:150
 read1	41	ref	1	61	1S1M1D1M1I	=	10	300	ACGT	!##$	bH:H:1AE30
+)"};
+
+    std::vector<std::string> issue3299_output{
+        R"(@HD	VN:1.6
+@SQ	SN:hello	LN:1000
+@SQ	SN:world	LN:2000
+)",
+        R"(@HD	VN:1.6
+@SQ	SN:hellofoo	LN:1001
+@SQ	SN:worldfoo	LN:2001
+)",
+        R"(@HD	VN:1.6
+@SQ	SN:hellofoofoo	LN:1002
+@SQ	SN:worldfoofoo	LN:2002
 )"};
 };
 
@@ -173,29 +188,19 @@ TEST_F(sam_format, header_errors)
         seqan3::sam_file_input fin{istream, seqan3::format_sam{}};
         EXPECT_NO_THROW(fin.begin());
     }
-    { // user defined tags should not trigger errors, but print warnings to cerr
+    { // user defined tags should not trigger errors
         std::string header_str{
             "@HD\tVN:1.6\tVB:user_tag\tSB:user_tag\tGB:user_tag\tpb:user_tag\n"
             "@SQ\tSN:ref2\tLN:243199373\tSB:user_tag\tLB:user_tag\tpb:user_tag\n"
             "@RG\tID:U0a_A2_L1\tIB:user_tag\tpb:user_tag\n"
             "@PG\tID:qc\tIB:user_tag\tPB:user_tag\tCB:user_tag\tDB:user_tag\tVB:user_tag\tpb:user_tag\n"};
-        std::string expected_cerr{"Unsupported tag found in SAM header @HD: \"VB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @HD: \"SB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @HD: \"GB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @HD: \"pb:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"IB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"PB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"CB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"DB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"VB:user_tag\"\n"
-                                  "Unsupported tag found in SAM header @PG: \"pb:user_tag\"\n"};
 
         std::istringstream istream(header_str);
         seqan3::sam_file_input fin{istream, seqan3::format_sam{}};
 
         testing::internal::CaptureStderr();
         EXPECT_NO_THROW(fin.begin());
-        EXPECT_EQ(testing::internal::GetCapturedStderr(), expected_cerr);
+        EXPECT_EQ(testing::internal::GetCapturedStderr(), "");
     }
     { // missing VN tag in @HD
         std::string header_str{"@HD\n"};
@@ -393,9 +398,9 @@ TEST_F(sam_format, write_different_header)
 
     write_header();
     ostream.flush();
-    EXPECT_EQ(
-        ostream.str(),
-        "@HD\tVN:1.6\tSO:coordinate\tSS:query\tGO:reference\n@SQ\tSN:ref\tLN:34\n*\t0\tref\t1\t0\t*\t*\t0\t0\t*\t*\n");
+    EXPECT_EQ(ostream.str(),
+              "@HD\tVN:1.6\tSO:coordinate\tSS:query\tGO:reference\n@SQ\tSN:ref\tLN:34\n*\t0\tref\t1\t0\t*\t*"
+              "\t0\t0\t*\t*\n");
 }
 
 TEST_F(sam_format, issue2195)

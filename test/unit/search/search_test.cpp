@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -10,7 +10,6 @@
 #include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/alphabet/quality/phred42.hpp>
 #include <seqan3/alphabet/quality/qualified.hpp>
-#include <seqan3/core/detail/all_view.hpp>
 #include <seqan3/search/configuration/hit.hpp>
 #include <seqan3/search/configuration/max_error.hpp>
 #include <seqan3/search/configuration/on_result.hpp>
@@ -26,13 +25,13 @@ using seqan3::operator""_phred42;
 
 using namespace std::string_literals;
 
-auto position = seqan3::detail::all
+auto position = std::views::all
               | std::views::transform(
                     [](auto && res)
                     {
                         return res.reference_begin_position();
                     });
-auto query_id = seqan3::detail::all
+auto query_id = std::views::all
               | std::views::transform(
                     [](auto && res)
                     {

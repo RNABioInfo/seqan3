@@ -1,12 +1,14 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.10...3.22)
+cmake_minimum_required (VERSION 3.20...3.31)
 project (seqan3_test_snippet CXX)
 
 include (../seqan3-test.cmake)
 include (../cmake/diagnostics/list_unused_snippets.cmake)
+
+CPMGetPackage (googletest)
 
 option (SEQAN3_GENERATE_SNIPPETS "Whether seqan3 snippets should be generated and overwritten within the source tree."
         ON)
@@ -38,7 +40,7 @@ macro (seqan3_snippet test_name_prefix snippet snippet_base_path)
     add_test (NAME "${snippet_compare_test_target}"
               COMMAND ${CMAKE_COMMAND} -DTARGET_FILE=$<TARGET_FILE:${target}>
                       -DSOURCE_FILE=${snippet_base_path}/${snippet} #
-                      -P "${CMAKE_SOURCE_DIR}/compare_snippet_output.cmake")
+                      -P "${CMAKE_CURRENT_SOURCE_DIR}/compare_snippet_output.cmake")
 
     # disable version checker, as it interferes with comparing the snippet output
     set_tests_properties ("${snippet_compare_test_target}" PROPERTIES ENVIRONMENT SEQAN3_NO_VERSION_CHECK=0)
@@ -55,9 +57,6 @@ macro (seqan3_snippets test_name_prefix snippet_base_path)
         seqan3_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
     endforeach ()
 endmacro ()
-
-seqan3_require_ccache ()
-seqan3_require_test ()
 
 seqan3_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
 seqan3_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")

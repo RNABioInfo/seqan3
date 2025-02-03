@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -39,4 +39,21 @@ TEST(debug_stream_test, unicode)
     stream << ";" << u << ";" << l << ";" << (D | u) << ";" << (D | u | l) << ";" << (D | U | u | L | l);
 
     EXPECT_EQ(s.str(), "↺;↖;↑;←;↖↑;↖←;↑←;↖↑←;⇡;⇠;↖⇡;↖⇡⇠;↖↑⇡←⇠");
+}
+
+TEST(trace_directions_printer_test, std_stream)
+{
+    std::stringstream s{};
+    seqan3::trace_directions_printer<seqan3::detail::trace_directions> printer{};
+    printer(s, N);
+    s << ';';
+    printer(s, D);
+    s << ';';
+    printer(s, L);
+    s << ';';
+    printer(s, U);
+    s << ';';
+    printer(s, D | U | u | L | l);
+
+    EXPECT_EQ(s.str(), "N;D;L;U;DUuLl");
 }

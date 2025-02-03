@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -735,14 +735,9 @@ public:
         for (size_type i = sz + length - 1; i > pos_as_num + length - 1; --i)
             data_[i] = data_[i - length];
 
-#if SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif // SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY
+        SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_START(-Wstringop-overflow)
         std::ranges::copy(begin_it, end_it, &data_[pos_as_num]);
-#if SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY
-#    pragma GCC diagnostic pop
-#endif // SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY
+        SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_STOP
         sz += length;
         return begin() + pos_as_num;
     }

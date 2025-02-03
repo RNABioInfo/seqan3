@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
 name: RAM-Usage
@@ -38,14 +38,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: seqan3
-          submodules: true
-
-      - name: Checkout SeqAn2
-        uses: actions/checkout@v4
-        with:
-          repository: seqan/seqan
-          path: seqan3/submodules/seqan
-          fetch-depth: 1
 
       - name: Setup compiler
         uses: seqan/actions/setup-compiler@main

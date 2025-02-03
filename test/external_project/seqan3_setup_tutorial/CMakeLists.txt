@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
 # --- helper scripts
@@ -14,11 +14,11 @@ file (COPY "${CMAKE_SOURCE_DIR}/../src/hello_world.cpp" DESTINATION "${CMAKE_CUR
 set (CMAKE_CURRENT_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../../../source")
 
 ## [adding_files]
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.20...3.31)
 project (seqan3_tutorial CXX)
 
 # add seqan3 to search path
-list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../seqan3/build_system")
+list (APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../seqan3/cmake")
 
 # require seqan3 with a version between >=3.0.0 and <4.0.0
 find_package (seqan3 3.0 REQUIRED)
@@ -31,8 +31,4 @@ add_executable (another_program another_program.cpp)
 target_link_libraries (another_program seqan3::seqan3)
 ## [adding_files]
 
-if (CMAKE_VERSION VERSION_LESS 3.14)
-    install (TARGETS hello_world another_program RUNTIME DESTINATION bin)
-else ()
-    install (TARGETS hello_world another_program) # RUNTIME DESTINATION not needed anymore since cmake 3.14
-endif ()
+install (TARGETS hello_world another_program)

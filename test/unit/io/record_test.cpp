@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
@@ -21,6 +21,7 @@ using default_fields = seqan3::fields<seqan3::field::seq, seqan3::field::id, seq
 // This is needed for EXPECT_RANGE_EQ:
 namespace seqan3
 {
+// TODO: This is only for the test. We might need to consider adding enumeration_names for the io fields to the library.
 template <typename char_t>
 inline debug_stream_type<char_t> & operator<<(debug_stream_type<char_t> & stream, field f)
 {

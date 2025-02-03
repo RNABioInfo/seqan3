@@ -1,5 +1,5 @@
-# SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-# SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+# SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 #
 # This CMake module will try to find SeqAn and its dependencies.  You can use
@@ -44,7 +44,6 @@
 #   SEQAN3_INCLUDE_DIRS     -- to be passed to include_directories ()
 #   SEQAN3_LIBRARIES        -- to be passed to target_link_libraries ()
 #   SEQAN3_DEFINITIONS      -- to be passed to add_definitions ()
-#   SEQAN3_CXX_FLAGS        -- to be added to CMAKE_CXX_FLAGS
 #
 # Additionally, the following [IMPORTED][IMPORTED] targets are defined:
 #
@@ -52,16 +51,13 @@
 #                                  target_link_libraries(target seqan3::seqan3)
 #                              automatically sets
 #                                  target_include_directories(target $SEQAN3_INCLUDE_DIRS),
-#                                  target_link_libraries(target $SEQAN3_LIBRARIES),
-#                                  target_compile_definitions(target $SEQAN3_DEFINITIONS) and
-#                                  target_compile_options(target $SEQAN3_CXX_FLAGS)
+#                                  target_link_libraries(target $SEQAN3_LIBRARIES) and
+#                                  target_compile_definitions(target $SEQAN3_DEFINITIONS)
 #                              for a target.
 #
 #   [IMPORTED]: https://cmake.org/cmake/help/v3.10/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED
 #
 # ============================================================================
-
-cmake_minimum_required (VERSION 3.5...3.12)
 
 # ----------------------------------------------------------------------------
 # Set initial variables
@@ -69,7 +65,7 @@ cmake_minimum_required (VERSION 3.5...3.12)
 
 # make output globally quiet if required by find_package, this effects cmake functions like `check_*`
 set (CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
-set (CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
+set (CMAKE_REQUIRED_QUIET 1)
 
 # ----------------------------------------------------------------------------
 # Greeter
@@ -113,16 +109,28 @@ macro (seqan3_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
+# CPM
+# ----------------------------------------------------------------------------
+
+# This will be true for git clones and source packages, but not for installed packages.
+if (EXISTS "${CMAKE_CURRENT_LIST_DIR}/CPM.cmake")
+    set (SEQAN3_HAS_CPM TRUE)
+else ()
+    set (SEQAN3_HAS_CPM FALSE)
+endif ()
+
+if (SEQAN3_HAS_CPM)
+    set (CPM_INDENT "  CMake Package Manager CPM: ")
+    include ("${CMAKE_CURRENT_LIST_DIR}/CPM.cmake")
+    CPMUsePackageLock ("${CMAKE_CURRENT_LIST_DIR}/package-lock.cmake")
+endif ()
+
+# ----------------------------------------------------------------------------
 # Find SeqAn3 include path
 # ----------------------------------------------------------------------------
 
 # Note that seqan3-config.cmake can be standalone and thus SEQAN3_CLONE_DIR might be empty.
-# * `SEQAN3_CLONE_DIR` was already found in seqan3-config-version.cmake
 # * `SEQAN3_INCLUDE_DIR` was already found in seqan3-config-version.cmake
-find_path (SEQAN3_SUBMODULES_DIR
-           NAMES submodules/sdsl-lite
-           HINTS "${SEQAN3_CLONE_DIR}" "${SEQAN3_INCLUDE_DIR}/seqan3")
-
 if (SEQAN3_INCLUDE_DIR)
     seqan3_config_print ("SeqAn3 include dir found:   ${SEQAN3_INCLUDE_DIR}")
 else ()
@@ -130,32 +138,34 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
-# Detect if we are a clone of repository and if yes auto-add submodules
+# Require SDSL
 # ----------------------------------------------------------------------------
 
-if (SEQAN3_CLONE_DIR)
-    seqan3_config_print ("Detected as running from a repository checkout…")
+find_path (SEQAN3_SDSL_INCLUDE_DIR
+           NAMES sdsl/version.hpp
+           HINTS "${SEQAN3_INCLUDE_DIR}/seqan3/vendor")
+
+# 1) Check the vendor directory of SeqAn3. This directory exists for source packages and installed packages.
+if (SEQAN3_SDSL_INCLUDE_DIR)
+    seqan3_config_print ("Required dependency:        SDSL found.")
+    set (SEQAN3_DEPENDENCY_INCLUDE_DIRS ${SEQAN3_SDSL_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
+    # 2) Get package via CPM.
+elseif (SEQAN3_HAS_CPM)
+    CPMGetPackage (sdsl-lite)
+
+    find_path (SEQAN3_SDSL_INCLUDE_DIR
+               NAMES sdsl/version.hpp
+               HINTS "${sdsl-lite_SOURCE_DIR}/include")
+
+    if (SEQAN3_SDSL_INCLUDE_DIR)
+        seqan3_config_print ("Required dependency:        SDSL found.")
+        set (SEQAN3_DEPENDENCY_INCLUDE_DIRS ${SEQAN3_SDSL_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
+    else ()
+        seqan3_config_error ("The SDSL library is required, but wasn't found.")
+    endif ()
+else ()
+    seqan3_config_error ("The SDSL library is required, but wasn't found.")
 endif ()
-
-if (SEQAN3_SUBMODULES_DIR)
-    file (GLOB submodules ${SEQAN3_SUBMODULES_DIR}/submodules/*/include)
-    foreach (submodule ${submodules})
-        if (IS_DIRECTORY ${submodule})
-            seqan3_config_print ("  …adding submodule include:  ${submodule}")
-            set (SEQAN3_DEPENDENCY_INCLUDE_DIRS ${submodule} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
-        endif ()
-    endforeach ()
-endif ()
-
-# ----------------------------------------------------------------------------
-# Options for CheckCXXSourceCompiles
-# ----------------------------------------------------------------------------
-
-# deactivate messages in check_*
-set (CMAKE_REQUIRED_QUIET 1)
-# use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${SEQAN3_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
-set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
 # Force-deactivate optional dependencies
@@ -189,51 +199,12 @@ option (SEQAN3_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 # Check supported compilers
 # ----------------------------------------------------------------------------
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
-    message (FATAL_ERROR "GCC < 10 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12)
+    message (FATAL_ERROR "GCC < 12 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
     message (FATAL_ERROR "Clang < 17 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
-endif ()
-
-# ----------------------------------------------------------------------------
-# Require C++20
-# ----------------------------------------------------------------------------
-
-set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-
-set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 202002L)
-      #error NOCXX20
-      #endif
-      int main() {}")
-
-set (SEQAN3_FEATURE_CPP20_FLAG_BUILTIN "")
-set (SEQAN3_FEATURE_CPP20_FLAG_STD20 "-std=c++20")
-
-set (SEQAN3_CPP20_FLAG "")
-
-foreach (_FLAG BUILTIN STD20)
-    set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} ${SEQAN3_FEATURE_CPP20_FLAG_${_FLAG}}")
-
-    check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CPP20_FLAG_${_FLAG})
-
-    if (CPP20_FLAG_${_FLAG})
-        set (SEQAN3_CPP20_FLAG ${_FLAG})
-        break ()
-    endif ()
-endforeach ()
-
-set (CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
-
-if (SEQAN3_CPP20_FLAG STREQUAL "BUILTIN")
-    seqan3_config_print ("C++ Standard-20 support:    builtin")
-elseif (SEQAN3_CPP20_FLAG)
-    set (SEQAN3_CXX_FLAGS "${SEQAN3_CXX_FLAGS} ${SEQAN3_FEATURE_CPP20_FLAG_${SEQAN3_CPP20_FLAG}}")
-    seqan3_config_print ("C++ Standard-20 support:    via ${SEQAN3_FEATURE_CPP20_FLAG_${SEQAN3_CPP20_FLAG}}")
-else ()
-    seqan3_config_error ("SeqAn3 requires C++20, but your compiler does not support it.")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -255,30 +226,43 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
-# Require SDSL
-# ----------------------------------------------------------------------------
-
-check_include_file_cxx (sdsl/version.hpp _SEQAN3_HAVE_SDSL)
-
-if (_SEQAN3_HAVE_SDSL)
-    seqan3_config_print ("Required dependency:        SDSL found.")
-else ()
-    seqan3_config_error (
-        "The SDSL library is required, but wasn't found. Get it from https://github.com/xxsds/sdsl-lite")
-endif ()
-
-# ----------------------------------------------------------------------------
 # Cereal dependency is optional, but may set as required
 # ----------------------------------------------------------------------------
 
 if (NOT SEQAN3_NO_CEREAL)
-    check_include_file_cxx (cereal/cereal.hpp _SEQAN3_HAVE_CEREAL)
+    find_path (SEQAN3_CEREAL_INCLUDE_DIR
+               NAMES cereal/version.hpp
+               HINTS "${SEQAN3_INCLUDE_DIR}/seqan3/vendor")
 
-    if (_SEQAN3_HAVE_CEREAL)
+    # 1) Check the vendor directory of SeqAn3. This directory exists for source packages and installed packages.
+    if (SEQAN3_CEREAL_INCLUDE_DIR)
         if (SEQAN3_CEREAL)
             seqan3_config_print ("Required dependency:        Cereal found.")
         else ()
             seqan3_config_print ("Optional dependency:        Cereal found.")
+        endif ()
+        set (SEQAN3_DEPENDENCY_INCLUDE_DIRS ${SEQAN3_CEREAL_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
+        # 2) Get package via CPM.
+    elseif (SEQAN3_HAS_CPM)
+        CPMGetPackage (cereal)
+
+        find_path (SEQAN3_CEREAL_INCLUDE_DIR
+                   NAMES cereal/version.hpp
+                   HINTS "${cereal_SOURCE_DIR}/include")
+
+        if (SEQAN3_CEREAL_INCLUDE_DIR)
+            if (SEQAN3_CEREAL)
+                seqan3_config_print ("Required dependency:        Cereal found.")
+            else ()
+                seqan3_config_print ("Optional dependency:        Cereal found.")
+            endif ()
+            set (SEQAN3_DEPENDENCY_INCLUDE_DIRS ${SEQAN3_CEREAL_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS})
+        else ()
+            if (SEQAN3_CEREAL)
+                seqan3_config_error ("The (optional) cereal library was marked as required, but wasn't found.")
+            else ()
+                seqan3_config_print ("Optional dependency:        Cereal not found.")
+            endif ()
         endif ()
     else ()
         if (SEQAN3_CEREAL)
@@ -364,14 +348,18 @@ set (CXXSTD_TEST_SOURCE "#include <seqan3/core/platform.hpp>
 # using try_compile instead of check_cxx_source_compiles to capture output in case of failure
 file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx" "${CXXSTD_TEST_SOURCE}\n")
 
-try_compile (SEQAN3_PLATFORM_TEST #
+# cmake-format: off
+try_compile (SEQAN3_PLATFORM_TEST
              ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
-             CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${SEQAN3_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SEQAN3_INCLUDE_DIR};${SEQAN3_DEPENDENCY_INCLUDE_DIRS}"
+             CMAKE_FLAGS "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${SEQAN3_INCLUDE_DIR};${SEQAN3_DEPENDENCY_INCLUDE_DIRS}"
              COMPILE_DEFINITIONS ${SEQAN3_DEFINITIONS}
              LINK_LIBRARIES ${SEQAN3_LIBRARIES}
+             CXX_STANDARD 23
+             CXX_STANDARD_REQUIRED ON
+             CXX_EXTENSIONS OFF
              OUTPUT_VARIABLE SEQAN3_PLATFORM_TEST_OUTPUT)
+# cmake-format: on
 
 if (SEQAN3_PLATFORM_TEST)
     seqan3_config_print ("SeqAn3 platform.hpp build:  passed.")
@@ -411,11 +399,9 @@ set (SEQAN3_INCLUDE_DIRS ${SEQAN3_INCLUDE_DIR} ${SEQAN3_DEPENDENCY_INCLUDE_DIRS}
 # ----------------------------------------------------------------------------
 
 if (SEQAN3_FOUND AND NOT TARGET seqan3::seqan3)
-    separate_arguments (SEQAN3_CXX_FLAGS_LIST UNIX_COMMAND "${SEQAN3_CXX_FLAGS}")
-
     add_library (seqan3_seqan3 INTERFACE)
     target_compile_definitions (seqan3_seqan3 INTERFACE ${SEQAN3_DEFINITIONS})
-    target_compile_options (seqan3_seqan3 INTERFACE ${SEQAN3_CXX_FLAGS_LIST})
+    target_compile_features (seqan3_seqan3 INTERFACE cxx_std_23)
     target_link_libraries (seqan3_seqan3 INTERFACE "${SEQAN3_LIBRARIES}")
     # include seqan3/include/ as -I, because seqan3 should never produce warnings.
     target_include_directories (seqan3_seqan3 INTERFACE "${SEQAN3_INCLUDE_DIR}")
@@ -442,7 +428,6 @@ if (SEQAN3_FIND_DEBUG)
     message ("  SEQAN3_INCLUDE_DIRS         ${SEQAN3_INCLUDE_DIRS}")
     message ("  SEQAN3_LIBRARIES            ${SEQAN3_LIBRARIES}")
     message ("  SEQAN3_DEFINITIONS          ${SEQAN3_DEFINITIONS}")
-    message ("  SEQAN3_CXX_FLAGS            ${SEQAN3_CXX_FLAGS}")
     message ("")
     message ("  SEQAN3_VERSION              ${SEQAN3_VERSION}")
     message ("  SEQAN3_VERSION_MAJOR        ${SEQAN3_VERSION_MAJOR}")

@@ -1,17 +1,16 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
 #include <seqan3/core/platform.hpp>
 
-#if !SEQAN3_WORKAROUND_GCC_96070
 //![snippet]
-#    include <iterator>
-#    include <ranges>
-#    include <sstream>
+#include <iterator>
+#include <ranges>
+#include <sstream>
 
-#    include <seqan3/io/sequence_file/input.hpp>
-#    include <seqan3/io/sequence_file/output.hpp>
+#include <seqan3/io/sequence_file/input.hpp>
+#include <seqan3/io/sequence_file/output.hpp>
 
 auto input = R"(@TEST1
 ACGT
@@ -51,4 +50,3 @@ int main()
         | seqan3::sequence_file_output{std::ostringstream{}, seqan3::format_fasta{}};
 }
 //![snippet]
-#endif // !SEQAN3_WORKAROUND_GCC_96070

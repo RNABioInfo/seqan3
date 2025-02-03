@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2024 Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2024 Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2025 Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2025 Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 /*!\file
@@ -113,7 +113,9 @@ public:
         this->number_of_columns = number_of_columns.get();
         optimal_column.clear();
         horizontal_column.clear();
+        SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_START(-Wstringop-overflow)
         optimal_column.resize(number_of_rows.get(), initial_value);
+        SEQAN3_WORKAROUND_GCC_BOGUS_MEMCPY_STOP
         horizontal_column.resize(number_of_rows.get(), initial_value);
         vertical_column = views::repeat_n(initial_value, number_of_rows.get());
     }
